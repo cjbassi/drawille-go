@@ -30,7 +30,7 @@ func NewCanvas() *Canvas {
 	}
 }
 
-func (self *Canvas) Set(p image.Point, color Color) {
+func (self *Canvas) SetPoint(p image.Point, color Color) {
 	point := image.Pt(p.X/2, p.Y/4)
 	self.CellMap[point] = Cell{
 		self.CellMap[point].Rune | BRAILLE[p.X%4][p.Y%2],
@@ -38,7 +38,18 @@ func (self *Canvas) Set(p image.Point, color Color) {
 	}
 }
 
-func Line(p0, p1 image.Point) []image.Point {
+func (self *Canvas) SetLine(p0, p1 image.Point, color Color) {
+	line := line(p0, p1)
+	for _, p := range line {
+		point := image.Pt(p.X/2, p.Y/4)
+		self.CellMap[point] = Cell{
+			self.CellMap[point].Rune | BRAILLE[p.X%4][p.Y%2],
+			color,
+		}
+	}
+}
+
+func line(p0, p1 image.Point) []image.Point {
 	points := []image.Point{}
 
 	leftPoint, rightPoint := p0, p1
