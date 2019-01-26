@@ -49,6 +49,14 @@ func (self *Canvas) SetLine(p0, p1 image.Point, color Color) {
 	}
 }
 
+func (self *Canvas) GetCells() map[image.Point]Cell {
+	cellMap := make(map[image.Point]Cell)
+	for point, cell := range self.CellMap {
+		cellMap[point] = Cell{cell.Rune + BRAILLE_OFFSET, cell.Color}
+	}
+	return cellMap
+}
+
 func line(p0, p1 image.Point) []image.Point {
 	points := []image.Point{}
 
