@@ -33,19 +33,14 @@ func NewCanvas() *Canvas {
 func (self *Canvas) SetPoint(p image.Point, color Color) {
 	point := image.Pt(p.X/2, p.Y/4)
 	self.CellMap[point] = Cell{
-		self.CellMap[point].Rune | BRAILLE[p.X%4][p.Y%2],
+		self.CellMap[point].Rune | BRAILLE[p.Y%4][p.X%2],
 		color,
 	}
 }
 
 func (self *Canvas) SetLine(p0, p1 image.Point, color Color) {
-	line := line(p0, p1)
-	for _, p := range line {
-		point := image.Pt(p.X/2, p.Y/4)
-		self.CellMap[point] = Cell{
-			self.CellMap[point].Rune | BRAILLE[p.X%4][p.Y%2],
-			color,
-		}
+	for _, p := range line(p0, p1) {
+		self.SetPoint(p, color)
 	}
 }
 
@@ -68,21 +63,19 @@ func line(p0, p1 image.Point) []image.Point {
 	xDistance := absInt(leftPoint.X - rightPoint.X)
 	yDistance := absInt(leftPoint.Y - rightPoint.Y)
 	slope := float64(yDistance) / float64(xDistance)
-	slopeDirection := 1
+	slopeSign := 1
 	if rightPoint.Y < leftPoint.Y {
-		slopeDirection = -1
+		slopeSign = -1
 	}
 
 	targetYCoordinate := float64(leftPoint.Y)
 	currentYCoordinate := leftPoint.Y
 	for i := leftPoint.X; i < rightPoint.X; i++ {
-		targetYCoordinate += (slope * float64(slopeDirection))
-		if currentYCoordinate == int(targetYCoordinate) {
-			points = append(points, image.Pt(i, currentYCoordinate))
-		}
+		points = append(points, image.Pt(i, currentYCoordinate))
+		targetYCoordinate += (slope * float64(slopeSign))
 		for currentYCoordinate != int(targetYCoordinate) {
 			points = append(points, image.Pt(i, currentYCoordinate))
-			currentYCoordinate += slopeDirection
+			currentYCoordinate += slopeSign
 		}
 	}
 
