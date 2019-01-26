@@ -39,5 +39,40 @@ func (self *Canvas) Set(p image.Point, color Color) {
 }
 
 func Line(p0, p1 image.Point) []image.Point {
-	return []image.Point{}
+	points := []image.Point{}
+
+	leftPoint, rightPoint := p0, p1
+	if leftPoint.X > rightPoint.X {
+		leftPoint, rightPoint = rightPoint, leftPoint
+	}
+
+	xDistance := absInt(leftPoint.X - rightPoint.X)
+	yDistance := absInt(leftPoint.Y - rightPoint.Y)
+	slope := float64(yDistance) / float64(xDistance)
+	slopeDirection := 1
+	if rightPoint.Y < leftPoint.Y {
+		slopeDirection = -1
+	}
+
+	targetYCoordinate := float64(leftPoint.Y)
+	currentYCoordinate := leftPoint.Y
+	for i := leftPoint.X; i < rightPoint.X; i++ {
+		targetYCoordinate += (slope * float64(slopeDirection))
+		if currentYCoordinate == int(targetYCoordinate) {
+			points = append(points, image.Pt(i, currentYCoordinate))
+		}
+		for currentYCoordinate != int(targetYCoordinate) {
+			points = append(points, image.Pt(i, currentYCoordinate))
+			currentYCoordinate += slopeDirection
+		}
+	}
+
+	return points
+}
+
+func absInt(x int) int {
+	if x >= 0 {
+		return x
+	}
+	return -x
 }
